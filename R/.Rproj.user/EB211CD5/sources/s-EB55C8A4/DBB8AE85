@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1547869836644.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "DBB8AE85",
+    "lastKnownWriteTime" : 1547925368,
+    "last_content_update" : 1547925371849,
+    "path" : "~/Documents/FS_LibraryRepo/Stackathon/R/zillowWebScraping.R",
+    "project_path" : "zillowWebScraping.R",
+    "properties" : {
+        "cursorPosition" : "130,0",
+        "scrollLine" : "40"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
