@@ -6,3 +6,8 @@ secrets.js
 npm-debug.log
 yarn-error.log
 .Rproj.user
+R/.Rhistory
+R/.Rproj.user
+R/HousingData.RData
+R/Stackathon.pages
+R/Stackathon.Rproj
