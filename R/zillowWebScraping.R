@@ -128,5 +128,18 @@ for(i in 308:450){
                                 homeDetails = home_details))
 }
 
-''
+soldHomes$OnMarket <- 0
+
+fullStackDB <- dbConnect(odbc::odbc(), "PostgreSQL victorfullstack")
+
+odbc::dbWriteTable(fullStackDB, 
+             DBI::Id(schema="stackathon",name="housingdata"), as.data.frame(soldHomes),
+             append = TRUE)
+
+totalHomes <- 
+  dbGetQuery(fullStackDB, "select * from stackathon.housingdata")
+
+readr::write_csv(totalHomes, "/Users/victormarta1/Documents/FS_LibraryRepo/totalHomes.csv")
+
+
 
