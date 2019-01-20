@@ -139,7 +139,7 @@ odbc::dbWriteTable(fullStackDB,
 totalHomes <- 
   dbGetQuery(fullStackDB, "select * from stackathon.housingdata")
 
-readr::write_csv(totalHomes, "/Users/victormarta1/Documents/FS_LibraryRepo/totalHomes.csv")
+
 
 
 
