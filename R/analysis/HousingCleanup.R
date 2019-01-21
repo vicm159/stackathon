@@ -62,14 +62,30 @@ housing %>% mutate(dateSold1 = str_replace(dateSold, "Sold on ",""))
 homeDetails <- 
 map_dfr(housing$homeDetails, function(row){
   output <- data_frame(beds = "", baths = "", sqft ="")
+  singlebath <- FALSE
+  singlebed <- FALSE
   beds_remove <- str_sub(row, str_locate(row, "beds")[[1]],-1)
+  if(is.na(beds_remove)){
+    beds_remove <- str_sub(row, str_locate(row, "bed")[[1]],-1)
+    singlebed <- TRUE
+  }
   beds <- str_remove(row, beds_remove) %>% str_remove_all(" ")
   output$beds <- beds
+  if(singlebed){
+    beds_remove <- str_remove(beds_remove, "bed")
+  }
   beds_remove <- str_remove(beds_remove, "beds")
   
   baths_remove <- str_sub(beds_remove, str_locate(beds_remove, "baths")[[1]],-1)
+  if(is.na(baths_remove)){
+    baths_remove <- str_sub(beds_remove, str_locate(beds_remove, "bath")[[1]],-1)
+    singlebath <- TRUE
+  }
   baths <- str_remove(beds_remove, baths_remove)
   output$baths <- baths
+  if(singlebath){
+    baths_remove <- str_remove(baths_remove, "bath")
+  }
   baths_remove <- str_remove(baths_remove, "baths")
   
   sqft_remove <- str_sub(baths_remove, str_locate(baths_remove, "sqft")[[1]],-1)
@@ -78,7 +94,7 @@ map_dfr(housing$homeDetails, function(row){
   return(output)
 }) 
 
-
+cbind(homeDetails, housing$homeDetails) %>% View
 
 
 
