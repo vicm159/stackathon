@@ -23,3 +23,22 @@ lm_first <-
 
 summary(lm_first)
 plot(lm_first)
+
+test <- 
+  filter(housing, OnMarket == 1) %>% 
+  select(beds, baths, sqft, city)
+
+lm_predict <-
+  predict(lm_first, test)
+
+ggplot(filter(housing, OnMarket == 1), aes(x = zillowEstimate1, y = lm_predict)) +
+  geom_point()
+
+ggplot(filter(housing, OnMarket == 1), aes(x = 1:446, y = zillowEstimate1)) +
+  geom_point() +
+  geom_point(aes(y = lm_predict), colour = "red")
+
+
+
+
+
