@@ -10,5 +10,6 @@ DB <-
 housing <- 
   dbReadTable(DB, Id(schema = "stackathon", name ="housingclean")) 
 
+qplot(soldPrice1, baths, data = housing)
 
 
