@@ -71,6 +71,10 @@ map_dfr(housing$homeDetails, function(row){
     singlebed <- TRUE
   }
   beds <- str_remove(row, beds_remove) %>% str_remove_all(" ")
+  # for some reason cannot get rid of beginning empty space so have to do this
+  if(is.na(as.numeric(str_sub(beds, 1,1)))){
+    beds <- str_sub(beds, 2,-1)
+  }
   output$beds <- beds
   if(singlebed){
     beds_remove <- str_remove(beds_remove, "bed")
@@ -83,6 +87,9 @@ map_dfr(housing$homeDetails, function(row){
     singlebath <- TRUE
   }
   baths <- str_remove(beds_remove, baths_remove)
+  if(is.na(as.numeric(str_sub(baths,1,1)))){
+    baths <- str_sub(baths,2,-1)
+  }
   output$baths <- baths
   if(singlebath){
     baths_remove <- str_remove(baths_remove, "bath")
@@ -94,6 +101,10 @@ map_dfr(housing$homeDetails, function(row){
   if(str_detect(row, "sqft") && is.na(sqft)){
     sqft <- str_remove(row, "sqft")
   }
+  sqft <- str_remove_all(sqft, "\\,")
+  if(is.na(as.numeric(str_sub(sqft, 1,1)))){
+    sqft <- str_sub(sqft, 2,-1)
+  }
   output$sqft <- sqft
   return(output)
 }) 
@@ -102,8 +113,13 @@ housing <-
   cbind(housing, homeDetails)
 rm(homeDetails)
 
+housing <- 
+  housing %>% mutate(beds = as.numeric(beds), baths = as.numeric(baths),
+                     sqft = as.numeric(sqft))
+
 zillowEst <- 
   str_replace_all(housing$zillowEstimate, "[^1234567890]","")
+
 
 housingClean <- 
   select(housing, zillowEstimate, OnMarket, soldPrice1, dateSold1, city, beds, baths, sqft,
@@ -119,6 +135,11 @@ housingClean <-
 housingClean <- 
   mutate(housingClean, dateSold1 = mdy(dateSold1))
 
-dbWriteTable(DB, Id(schema = "stackathon", name = "housingclean"), housingClean)
+housingClean <- 
+  housingClean %>% mutate(soldPrice1 = as.numeric(soldPrice1),
+                     zillowEstimate1 = as.numeric(zillowEstimate1))
+
+dbWriteTable(DB, Id(schema = "stackathon", name = "housingclean"), housingClean,
+             overwrite = TRUE)
 
 
