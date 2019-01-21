@@ -59,8 +59,27 @@ housing %>% mutate(soldPrice1 = str_replace(soldPrice," Sold:","")) %>%
 housing <- 
 housing %>% mutate(dateSold1 = str_replace(dateSold, "Sold on ",""))
 
-ggplot(housing, aes(x = city, y = as.numeric(soldPrice1)/1000)) +
-  geom_point()
+homeDetails <- 
+map_dfr(housing$homeDetails, function(row){
+  output <- data_frame(beds = "", baths = "", sqft ="")
+  beds_remove <- str_sub(row, str_locate(row, "beds")[[1]],-1)
+  beds <- str_remove(row, beds_remove) %>% str_remove_all(" ")
+  output$beds <- beds
+  beds_remove <- str_remove(beds_remove, "beds")
+  
+  baths_remove <- str_sub(beds_remove, str_locate(beds_remove, "baths")[[1]],-1)
+  baths <- str_remove(beds_remove, baths_remove)
+  output$baths <- baths
+  baths_remove <- str_remove(baths_remove, "baths")
+  
+  sqft_remove <- str_sub(baths_remove, str_locate(baths_remove, "sqft")[[1]],-1)
+  sqft <- str_remove(baths_remove, sqft_remove)
+  output$sqft <- sqft
+  return(output)
+}) 
+
+
+
 
 
 
