@@ -1,6 +1,7 @@
 library(tidyverse)
 library(DBI)
 library(odbc)
+library(lubridate)
 
 DB <- 
   dbConnect(odbc(), "PostgreSQL victorfullstack")
@@ -90,12 +91,34 @@ map_dfr(housing$homeDetails, function(row){
   
   sqft_remove <- str_sub(baths_remove, str_locate(baths_remove, "sqft")[[1]],-1)
   sqft <- str_remove(baths_remove, sqft_remove)
+  if(str_detect(row, "sqft") && is.na(sqft)){
+    sqft <- str_remove(row, "sqft")
+  }
   output$sqft <- sqft
   return(output)
 }) 
 
-cbind(homeDetails, housing$homeDetails) %>% View
+housing <- 
+  cbind(housing, homeDetails)
+rm(homeDetails)
 
+zillowEst <- 
+  str_replace_all(housing$zillowEstimate, "[^1234567890]","")
 
+housingClean <- 
+  select(housing, zillowEstimate, OnMarket, soldPrice1, dateSold1, city, beds, baths, sqft,
+         address1) %>%
+  cbind(data_frame(zillowEstimate1 = zillowEst))
+
+# easier way for regex and string manipulation
+# housingClean <- 
+#   mutate(housingClean, soldPrice = str_replace_all(soldPrice, "[^1234567890]",""),
+#          dateSold = str_replace_all(dateSold, "[^0-9]","")) %>%
+#   mutate(dateSold =  mdy(dateSold))
+
+housingClean <- 
+  mutate(housingClean, dateSold1 = mdy(dateSold1))
+
+dbWriteTable(DB, Id(schema = "stackathon", name = "housingclean"), housingClean)
 
 
