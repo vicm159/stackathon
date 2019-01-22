@@ -1,39 +1,45 @@
-#
-# This is a Plumber API. In RStudio 1.2 or newer you can run the API by
-# clicking the 'Run API' button above.
-#
-# In RStudio 1.1 or older, see the Plumber documentation for details
-# on running the API.
-#
-# Find out more about building APIs with Plumber here:
-#
-#    https://www.rplumber.io/
-#
-
 library(plumber)
+library(DBI)
+library(odbc)
+library(ggplot2)
 
-#* @apiTitle Plumber Example API
+DB <-
+  dbConnect(odbc(), "PostgreSQL victorfullstack")
 
-#* Echo back the input
-#* @param msg The message to echo
-#* @get /echo
-function(msg=""){
-  list(msg = paste0("The message is: '", msg, "'"))
+housing <- 
+  dbGetQuery(DB, "select * from stackathon.\"lmPrediction\"")
+
+#* @filter cors
+cors <- function(res) {
+  res$setHeader("Access-Control-Allow-Origin", "*")
+  plumber::forward()
+}
+
+#* Log some information about the incoming request
+#* @filter logger
+function(req){
+  cat(as.character(Sys.time()), "-", 
+      req$REQUEST_METHOD, req$PATH_INFO, "-", 
+      req$HTTP_USER_AGENT, "@", req$REMOTE_ADDR, "\n")
+  plumber::forward()
 }
 
 #* Plot a histogram
-#* @png
-#* @get /plot
+#* @get /firstHouse
 function(){
-  rand <- rnorm(100)
-  hist(rand)
+  sample_n(housing, 1)
 }
 
-#* Return the sum of two numbers
-#* @param a The first number to add
-#* @param b The second number to add
-#* @post /sum
-function(a, b){
-  as.numeric(a) + as.numeric(b)
+
+#* @param city The second number to add
+#* @get /graph/city
+#* @png
+function(){
+  output <- 
+    housing %>%
+    ggplot(aes(x = lm_predict/1000, y = zillowEstimate1/1000)) +
+    geom_point() + labs(x = "Linear Model Prediction in thousands", y = "Zillow Estimate in thousands") +
+    labs(title = "Zillow vs my Prediction vs (eventually) your Guess")
+  print(output)
 }
 
