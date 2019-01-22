@@ -1,12 +1,12 @@
 library(plumber)
 library(DBI)
 library(odbc)
-library(ggplot2)
+library(tidyverse)
 
 DB <-
   dbConnect(odbc(), "PostgreSQL victorfullstack")
 
-housing <- 
+housing <-
   dbGetQuery(DB, "select * from stackathon.\"lmPrediction\"")
 
 #* @filter cors
@@ -18,8 +18,8 @@ cors <- function(res) {
 #* Log some information about the incoming request
 #* @filter logger
 function(req){
-  cat(as.character(Sys.time()), "-", 
-      req$REQUEST_METHOD, req$PATH_INFO, "-", 
+  cat(as.character(Sys.time()), "-",
+      req$REQUEST_METHOD, req$PATH_INFO, "-",
       req$HTTP_USER_AGENT, "@", req$REMOTE_ADDR, "\n")
   plumber::forward()
 }
@@ -31,11 +31,11 @@ function(){
 }
 
 
-#* @param city The second number to add
+
 #* @get /graph/city
 #* @png
 function(){
-  output <- 
+  output <-
     housing %>%
     ggplot(aes(x = lm_predict/1000, y = zillowEstimate1/1000)) +
     geom_point() + labs(x = "Linear Model Prediction in thousands", y = "Zillow Estimate in thousands") +
